@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct PeopleListView: View {
     @Environment(\.modelContext) private var modelContext
@@ -90,7 +91,11 @@ struct PeopleListView: View {
     }
 
     private var logCallButton: some View {
-        Button {
+        // Half the safe-area inset gets added to BOTH top and bottom padding
+        // (not just the bottom), so the text sits centered in the full bar
+        // once the background bleeds down through the home-indicator area.
+        let extra = bottomSafeAreaInset / 2
+        return Button {
             showingLogCall = true
         } label: {
             HStack(spacing: 10) {
@@ -101,10 +106,18 @@ struct PeopleListView: View {
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 18)
-            .background(Theme.logCallGreen.ignoresSafeArea(edges: .bottom))
+            .padding(.top, 18 + extra)
+            .padding(.bottom, 18 + extra)
+            .background(Theme.logCallGreen)
         }
         .buttonStyle(.plain)
+        .ignoresSafeArea(edges: .bottom)
+    }
+
+    private var bottomSafeAreaInset: CGFloat {
+        (UIApplication.shared.connectedScenes.first as? UIWindowScene)?
+            .windows.first(where: \.isKeyWindow)?
+            .safeAreaInsets.bottom ?? 0
     }
 
     @ViewBuilder
