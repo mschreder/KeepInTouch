@@ -12,6 +12,8 @@ final class Person {
     var lastContactedAt: Date?
     var notes: String = ""
     var createdAt: Date = Date()
+    var birthdayMonth: Int?
+    var birthdayDay: Int?
 
     init(
         name: String,
@@ -21,7 +23,9 @@ final class Person {
         frequencyDays: Int = 30,
         lastContactedAt: Date? = nil,
         notes: String = "",
-        createdAt: Date = Date()
+        createdAt: Date = Date(),
+        birthdayMonth: Int? = nil,
+        birthdayDay: Int? = nil
     ) {
         self.id = UUID()
         self.name = name
@@ -32,5 +36,7 @@ final class Person {
         self.lastContactedAt = lastContactedAt
         self.notes = notes
         self.createdAt = createdAt
+        self.birthdayMonth = birthdayMonth
+        self.birthdayDay = birthdayDay
     }
 }

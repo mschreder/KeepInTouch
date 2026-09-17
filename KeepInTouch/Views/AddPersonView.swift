@@ -14,6 +14,8 @@ struct AddPersonView: View {
     @State private var photoData: Data?
     @State private var contactIdentifier: String?
     @State private var frequencyDays = 30
+    @State private var hasBirthday = false
+    @State private var birthdayDate = Date()
     @State private var pickerCoordinator = ContactPickerCoordinator()
 
     var body: some View {
@@ -43,6 +45,16 @@ struct AddPersonView: View {
                         Text("Every 6 months").tag(180)
                     }
                 }
+
+                Section("Birthday") {
+                    Toggle("Remind me on their birthday", isOn: $hasBirthday.animation())
+                    if hasBirthday {
+                        DatePicker("Birthday", selection: $birthdayDate, displayedComponents: .date)
+                        Text("Only the month and day are used — the year doesn't matter.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
             .navigationTitle("Add Person")
             .toolbar {
@@ -63,10 +75,34 @@ struct AddPersonView: View {
             name = [contact.givenName, contact.familyName].filter { !$0.isEmpty }.joined(separator: " ")
             phoneNumber = contact.phoneNumbers.first?.value.stringValue ?? ""
             photoData = contact.thumbnailImageData
+            fetchBirthday(forContactIdentifier: contact.identifier)
         }
         let picker = CNContactPickerViewController()
         picker.delegate = pickerCoordinator
         topMostViewController()?.present(picker, animated: true)
+    }
+
+    /// Birthday isn't part of the small set of properties the picker hands back
+    /// directly, so it needs its own permissioned fetch. Best-effort: if access
+    /// isn't granted or the contact has no birthday on file, we just leave the
+    /// field for the user to fill in themselves.
+    private func fetchBirthday(forContactIdentifier identifier: String) {
+        let store = CNContactStore()
+        store.requestAccess(for: .contacts) { granted, _ in
+            guard granted else { return }
+            let keys = [CNContactBirthdayKey as CNKeyDescriptor]
+            guard let contact = try? store.unifiedContact(withIdentifier: identifier, keysToFetch: keys),
+                  let birthday = contact.birthday,
+                  let month = birthday.month,
+                  let day = birthday.day,
+                  let date = Calendar.current.date(from: DateComponents(year: 2000, month: month, day: day)) else {
+                return
+            }
+            DispatchQueue.main.async {
+                hasBirthday = true
+                birthdayDate = date
+            }
+        }
     }
 
     private func topMostViewController() -> UIViewController? {
@@ -82,12 +118,15 @@ struct AddPersonView: View {
     }
 
     private func save() {
+        let birthdayComponents = hasBirthday ? Calendar.current.dateComponents([.month, .day], from: birthdayDate) : nil
         let person = Person(
             name: name.trimmingCharacters(in: .whitespaces),
             phoneNumber: phoneNumber.isEmpty ? nil : phoneNumber,
             contactIdentifier: contactIdentifier,
             photoData: photoData,
-            frequencyDays: frequencyDays
+            frequencyDays: frequencyDays,
+            birthdayMonth: birthdayComponents?.month,
+            birthdayDay: birthdayComponents?.day
         )
         modelContext.insert(person)
         notificationService.reschedule(for: person)

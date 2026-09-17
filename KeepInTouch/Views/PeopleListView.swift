@@ -53,7 +53,10 @@ struct PeopleListView: View {
             .sheet(isPresented: $showingAddPerson) {
                 AddPersonView()
             }
-            .onAppear {
+            .task {
+                // Wait for the authorization prompt to resolve before scheduling,
+                // otherwise reminders can be added while still unauthorized.
+                await notificationService.requestAuthorization()
                 notificationService.rescheduleAll(for: people)
             }
         }

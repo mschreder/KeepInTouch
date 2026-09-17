@@ -18,9 +18,6 @@ struct KeepInTouchApp: App {
                     callObserverService.onCallEnded = {
                         showPostCallPrompt = true
                     }
-                    Task {
-                        await notificationService.requestAuthorization()
-                    }
                 }
         }
         .modelContainer(for: Person.self)

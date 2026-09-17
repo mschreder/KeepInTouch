@@ -27,6 +27,16 @@ struct PersonDetailView: View {
                 FrequencyPicker(days: $person.frequencyDays)
             }
 
+            Section("Birthday") {
+                Toggle("Remind me on their birthday", isOn: hasBirthdayBinding.animation())
+                if hasBirthday {
+                    DatePicker("Birthday", selection: birthdayDateBinding, displayedComponents: .date)
+                    Text("Only the month and day are used — the year doesn't matter.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Section("Contact") {
                 LabeledContent("Last called") {
                     Text(lastContactedText)
@@ -89,6 +99,45 @@ struct PersonDetailView: View {
     private func logCall() {
         person.lastContactedAt = Date()
         notificationService.reschedule(for: person)
+    }
+
+    private var hasBirthday: Bool {
+        person.birthdayMonth != nil && person.birthdayDay != nil
+    }
+
+    private var hasBirthdayBinding: Binding<Bool> {
+        Binding<Bool>(
+            get: { hasBirthday },
+            set: { newValue in
+                if newValue {
+                    let today = Calendar.current.dateComponents([.month, .day], from: Date())
+                    person.birthdayMonth = today.month
+                    person.birthdayDay = today.day
+                } else {
+                    person.birthdayMonth = nil
+                    person.birthdayDay = nil
+                }
+                notificationService.reschedule(for: person)
+            }
+        )
+    }
+
+    private var birthdayDateBinding: Binding<Date> {
+        Binding<Date>(
+            get: {
+                guard let month = person.birthdayMonth, let day = person.birthdayDay,
+                      let date = Calendar.current.date(from: DateComponents(year: 2000, month: month, day: day)) else {
+                    return Date()
+                }
+                return date
+            },
+            set: { newDate in
+                let components = Calendar.current.dateComponents([.month, .day], from: newDate)
+                person.birthdayMonth = components.month
+                person.birthdayDay = components.day
+                notificationService.reschedule(for: person)
+            }
+        )
     }
 }
 
