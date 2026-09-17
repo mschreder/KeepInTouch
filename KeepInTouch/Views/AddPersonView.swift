@@ -15,16 +15,13 @@ struct AddPersonView: View {
     @State private var contactIdentifier: String?
     @State private var frequencyDays = 30
     @State private var showingPicker = false
-    @State private var showingPermissionAlert = false
-
-    private let contactsService = ContactsService()
 
     var body: some View {
         NavigationStack {
             Form {
                 Section {
                     Button {
-                        Task { await requestContact() }
+                        showingPicker = true
                     } label: {
                         Label("Choose from Contacts", systemImage: "person.crop.circle.badge.plus")
                     }
@@ -60,36 +57,15 @@ struct AddPersonView: View {
             .sheet(isPresented: $showingPicker) {
                 ContactPickerView(onPick: handlePicked, onCancel: { showingPicker = false })
             }
-            .alert("Contacts Access Needed", isPresented: $showingPermissionAlert) {
-                Button("Open Settings") {
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(url)
-                    }
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("Allow contacts access in Settings to pick from your address book, or just type a name below.")
-            }
-        }
-    }
-
-    private func requestContact() async {
-        let granted = await contactsService.requestAccess()
-        if granted {
-            showingPicker = true
-        } else {
-            showingPermissionAlert = true
         }
     }
 
     private func handlePicked(_ contact: CNContact) {
         showingPicker = false
         contactIdentifier = contact.identifier
-        if let full = try? contactsService.fetchFullContact(identifier: contact.identifier) {
-            name = [full.givenName, full.familyName].filter { !$0.isEmpty }.joined(separator: " ")
-            phoneNumber = full.phoneNumbers.first?.value.stringValue ?? ""
-            photoData = full.thumbnailImageData
-        }
+        name = [contact.givenName, contact.familyName].filter { !$0.isEmpty }.joined(separator: " ")
+        phoneNumber = contact.phoneNumbers.first?.value.stringValue ?? ""
+        photoData = contact.thumbnailImageData
     }
 
     private func save() {
