@@ -1,0 +1,25 @@
+name: KeepInTouch
+options:
+  bundleIdPrefix: com.matthewschreder
+  deploymentTarget:
+    iOS: "17.0"
+targets:
+  KeepInTouch:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: KeepInTouch
+    info:
+      path: KeepInTouch/Info.plist
+      properties:
+        UILaunchScreen: {}
+        NSContactsUsageDescription: "Keep In Touch uses Contacts so you can pick friends and family to track, and to keep their name and photo up to date."
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.matthewschreder.KeepInTouch
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETSCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETSCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        CODE_SIGN_STYLE: Automatic
