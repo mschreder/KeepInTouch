@@ -37,7 +37,8 @@ struct KeepInTouchApp: App {
         }
 
         let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground()
+        appearance.configureWithOpaqueBackground()
+        appearance.shadowColor = .clear
         appearance.backgroundColor = UIColor { trait in
             trait.userInterfaceStyle == .dark
                 ? UIColor(red: 0x1B / 255, green: 0x17 / 255, blue: 0x12 / 255, alpha: 1)
