@@ -93,13 +93,18 @@ struct PeopleListView: View {
         Button {
             showingLogCall = true
         } label: {
-            BigActionLabel(title: "Log a Call", systemImage: "phone.fill", background: .green)
+            HStack(spacing: 10) {
+                Image(systemName: "phone.fill")
+                    .font(.system(size: 17, weight: .semibold))
+                Text("Log a Call")
+                    .font(.system(size: 17, weight: .semibold))
+            }
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 18)
+            .background(Theme.logCallGreen.ignoresSafeArea(edges: .bottom))
         }
         .buttonStyle(.plain)
-        .padding(.horizontal, 20)
-        .padding(.top, 12)
-        .padding(.bottom, 8)
-        .background(Theme.background)
     }
 
     @ViewBuilder

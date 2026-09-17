@@ -20,6 +20,7 @@ enum Theme {
     static let overdue = adaptive(light: (0x9C, 0x3F, 0x2E), dark: (0xD9, 0x7A, 0x64))
     static let dueSoon = adaptive(light: (0xB0, 0x8A, 0x3E), dark: (0xD9, 0xB8, 0x76))
     static let onTrack = adaptive(light: (0x5B, 0x7A, 0x5C), dark: (0x8F, 0xB0, 0x90))
+    static let logCallGreen = adaptive(light: (0x33, 0x4D, 0x37), dark: (0x5C, 0x87, 0x63))
 
     static func statusColor(_ status: ContactStatus) -> Color {
         switch status {
