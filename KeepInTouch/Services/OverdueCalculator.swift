@@ -1,6 +1,6 @@
 import Foundation
 
-enum ContactStatus {
+enum ContactStatus: Equatable {
     case overdue
     case dueSoon
     case onTrack
