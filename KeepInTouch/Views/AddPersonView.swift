@@ -47,7 +47,7 @@ struct AddPersonView: View {
                 }
 
                 Section("Birthday") {
-                    Toggle("Remind me on their birthday", isOn: $hasBirthday.animation())
+                    Toggle("Remind me", isOn: $hasBirthday.animation())
                     if hasBirthday {
                         DatePicker("Birthday", selection: $birthdayDate, displayedComponents: .date)
                         Text("Only the month and day are used — the year doesn't matter.")

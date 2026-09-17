@@ -20,6 +20,20 @@ struct PersonDetailView: View {
                             Text(phone).foregroundStyle(.secondary)
                         }
                     }
+                    Spacer()
+                    if let phone = person.phoneNumber, !phone.isEmpty {
+                        Button {
+                            call(phone)
+                        } label: {
+                            Image(systemName: "phone.fill")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .frame(width: 40, height: 40)
+                                .background(Color.green)
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
             }
 
@@ -28,7 +42,7 @@ struct PersonDetailView: View {
             }
 
             Section("Birthday") {
-                Toggle("Remind me on their birthday", isOn: hasBirthdayBinding.animation())
+                Toggle("Remind me", isOn: hasBirthdayBinding.animation())
                 if hasBirthday {
                     DatePicker("Birthday", selection: birthdayDateBinding, displayedComponents: .date)
                     Text("Only the month and day are used — the year doesn't matter.")
@@ -99,6 +113,12 @@ struct PersonDetailView: View {
     private func logCall() {
         person.lastContactedAt = Date()
         notificationService.reschedule(for: person)
+    }
+
+    private func call(_ phoneNumber: String) {
+        let digits = phoneNumber.filter { $0.isNumber || $0 == "+" }
+        guard !digits.isEmpty, let url = URL(string: "tel://\(digits)") else { return }
+        UIApplication.shared.open(url)
     }
 
     private var hasBirthday: Bool {
