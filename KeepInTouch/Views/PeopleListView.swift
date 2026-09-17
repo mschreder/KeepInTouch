@@ -25,7 +25,8 @@ struct PeopleListView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
+            VStack(spacing: 0) {
+                topBar
                 if people.isEmpty {
                     ContentUnavailableView {
                         Label("No one yet", systemImage: "leaf.fill")
@@ -45,22 +46,7 @@ struct PeopleListView: View {
                 }
             }
             .background(Theme.background)
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Text("Keep In Touch")
-                        .font(.organic(.largeTitle))
-                        .foregroundStyle(Theme.ink)
-                }
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        showingAddPerson = true
-                    } label: {
-                        Label("Add Person", systemImage: "plus")
-                    }
-                }
-            }
+            .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $showingAddPerson) {
                 AddPersonView()
             }
@@ -71,6 +57,29 @@ struct PeopleListView: View {
                 notificationService.rescheduleAll(for: people)
             }
         }
+    }
+
+    private var topBar: some View {
+        HStack {
+            Text("Keep In Touch")
+                .font(.organic(.largeTitle))
+                .foregroundStyle(Theme.ink)
+            Spacer()
+            Button {
+                showingAddPerson = true
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 36, height: 36)
+                    .background(Color.accentColor)
+                    .clipShape(Circle())
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .padding(.bottom, 12)
+        .background(Theme.background)
     }
 
     @ViewBuilder
