@@ -48,6 +48,9 @@ struct PeopleListView: View {
             }
             .background(Theme.background)
             .toolbar(.hidden, for: .navigationBar)
+            .safeAreaInset(edge: .bottom) {
+                logCallButton
+            }
             .sheet(isPresented: $showingAddPerson) {
                 AddPersonView()
             }
@@ -69,32 +72,33 @@ struct PeopleListView: View {
                 .font(.organic(.largeTitle))
                 .foregroundStyle(Theme.ink)
             Spacer()
-            HStack(spacing: 10) {
-                Button {
-                    showingLogCall = true
-                } label: {
-                    Image(systemName: "phone.arrow.up.right")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 36, height: 36)
-                        .background(Color.accentColor)
-                        .clipShape(Circle())
-                }
-                Button {
-                    showingAddPerson = true
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 36, height: 36)
-                        .background(Color.accentColor)
-                        .clipShape(Circle())
-                }
+            Button {
+                showingAddPerson = true
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 36, height: 36)
+                    .background(Color.accentColor)
+                    .clipShape(Circle())
             }
         }
         .padding(.horizontal, 20)
         .padding(.top, 8)
         .padding(.bottom, 12)
+        .background(Theme.background)
+    }
+
+    private var logCallButton: some View {
+        Button {
+            showingLogCall = true
+        } label: {
+            BigActionLabel(title: "Log a Call", systemImage: "phone.fill", background: .green)
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 8)
         .background(Theme.background)
     }
 

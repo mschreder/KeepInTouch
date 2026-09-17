@@ -8,8 +8,7 @@ struct PersonDetailView: View {
     @Environment(NotificationService.self) private var notificationService
     @Environment(\.dismiss) private var dismiss
     @State private var showingDeleteConfirm = false
-    @State private var showingLogCallChoice = false
-    @State private var showingLogCallDatePicker = false
+    @State private var showingLogCallFlow = false
 
     var body: some View {
         Form {
@@ -61,7 +60,7 @@ struct PersonDetailView: View {
                     Text(lastContactedText)
                 }
                 Button("Log a call now") {
-                    showingLogCallChoice = true
+                    showingLogCallFlow = true
                 }
             }
             .listRowBackground(Theme.surface)
@@ -99,22 +98,9 @@ struct PersonDetailView: View {
             }
             Button("Cancel", role: .cancel) {}
         }
-        .confirmationDialog(
-            "Log a call with \(person.name)",
-            isPresented: $showingLogCallChoice,
-            titleVisibility: .visible
-        ) {
-            Button("Today") {
-                logCall(date: Date())
-            }
-            Button("Choose a Date…") {
-                showingLogCallDatePicker = true
-            }
-            Button("Cancel", role: .cancel) {}
-        }
-        .sheet(isPresented: $showingLogCallDatePicker) {
-            LogCallDatePickerSheet(initialDate: person.lastContactedAt ?? Date()) { date in
-                logCall(date: date)
+        .sheet(isPresented: $showingLogCallFlow) {
+            NavigationStack {
+                LogCallDateChoiceView(person: person, onLogged: { showingLogCallFlow = false })
             }
         }
     }
@@ -138,11 +124,6 @@ struct PersonDetailView: View {
     private var lastContactedText: String {
         guard let last = person.lastContactedAt else { return "Never" }
         return last.formatted(date: .abbreviated, time: .omitted)
-    }
-
-    private func logCall(date: Date) {
-        person.lastContactedAt = date
-        notificationService.reschedule(for: person)
     }
 
     private func call(_ phoneNumber: String) {
