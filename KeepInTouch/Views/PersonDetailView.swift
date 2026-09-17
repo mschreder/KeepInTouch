@@ -15,9 +15,9 @@ struct PersonDetailView: View {
                 HStack(spacing: 16) {
                     avatar
                     VStack(alignment: .leading) {
-                        Text(person.name).font(.title2).bold()
+                        Text(person.name).font(.organic(.title2)).foregroundStyle(Theme.ink)
                         if let phone = person.phoneNumber, !phone.isEmpty {
-                            Text(phone).foregroundStyle(.secondary)
+                            Text(phone).foregroundStyle(Theme.inkMuted)
                         }
                     }
                     Spacer()
@@ -36,10 +36,12 @@ struct PersonDetailView: View {
                     }
                 }
             }
+            .listRowBackground(Theme.surface)
 
             Section("Frequency") {
                 FrequencyPicker(days: $person.frequencyDays)
             }
+            .listRowBackground(Theme.surface)
 
             Section("Birthday") {
                 Toggle("Remind me", isOn: hasBirthdayBinding.animation())
@@ -47,9 +49,10 @@ struct PersonDetailView: View {
                     DatePicker("Birthday", selection: birthdayDateBinding, displayedComponents: .date)
                     Text("Only the month and day are used — the year doesn't matter.")
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Theme.inkMuted)
                 }
             }
+            .listRowBackground(Theme.surface)
 
             Section("Contact") {
                 LabeledContent("Last called") {
@@ -59,18 +62,24 @@ struct PersonDetailView: View {
                     logCall()
                 }
             }
+            .listRowBackground(Theme.surface)
 
             Section("Notes") {
                 TextEditor(text: $person.notes)
                     .frame(minHeight: 80)
+                    .scrollContentBackground(.hidden)
             }
+            .listRowBackground(Theme.surface)
 
             Section {
                 Button("Remove from Keep In Touch", role: .destructive) {
                     showingDeleteConfirm = true
                 }
             }
+            .listRowBackground(Theme.surface)
         }
+        .scrollContentBackground(.hidden)
+        .background(Theme.background)
         .navigationTitle(person.name)
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: person.frequencyDays) { _, _ in
@@ -97,12 +106,13 @@ struct PersonDetailView: View {
             } else {
                 Image(systemName: "person.crop.circle.fill")
                     .resizable()
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Theme.inkMuted)
             }
         }
         .scaledToFill()
         .frame(width: 60, height: 60)
         .clipShape(Circle())
+        .overlay(Circle().stroke(Theme.divider, lineWidth: 1.5))
     }
 
     private var lastContactedText: String {

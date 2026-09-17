@@ -9,11 +9,11 @@ struct PersonRowView: View {
             avatar
             VStack(alignment: .leading, spacing: 2) {
                 Text(person.name)
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+                    .font(.organic(.headline))
+                    .foregroundStyle(Theme.ink)
                 Text(lastContactedText)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Theme.inkMuted)
             }
             Spacer()
             statusBadge
@@ -29,12 +29,13 @@ struct PersonRowView: View {
             } else {
                 Image(systemName: "person.crop.circle.fill")
                     .resizable()
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Theme.inkMuted)
             }
         }
         .scaledToFill()
         .frame(width: 44, height: 44)
         .clipShape(Circle())
+        .overlay(Circle().stroke(Theme.divider, lineWidth: 1.5))
     }
 
     private var lastContactedText: String {
@@ -50,8 +51,8 @@ struct PersonRowView: View {
             .font(.caption).bold()
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(color(for: status).opacity(0.15))
-            .foregroundStyle(color(for: status))
+            .background(Theme.statusColor(status).opacity(0.16))
+            .foregroundStyle(Theme.statusColor(status))
             .clipShape(Capsule())
     }
 
@@ -60,14 +61,6 @@ struct PersonRowView: View {
         case .overdue: return "Overdue"
         case .dueSoon: return "Due Soon"
         case .onTrack: return "On Track"
-        }
-    }
-
-    private func color(for status: ContactStatus) -> Color {
-        switch status {
-        case .overdue: return .red
-        case .dueSoon: return .orange
-        case .onTrack: return .green
         }
     }
 }

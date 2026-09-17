@@ -27,19 +27,23 @@ struct PeopleListView: View {
         NavigationStack {
             Group {
                 if people.isEmpty {
-                    ContentUnavailableView(
-                        "No one yet",
-                        systemImage: "person.crop.circle.badge.plus",
-                        description: Text("Add friends and family to start tracking how often you talk.")
-                    )
+                    ContentUnavailableView {
+                        Label("No one yet", systemImage: "leaf.fill")
+                    } description: {
+                        Text("Add friends and family to start tracking how often you talk.")
+                    }
+                    .foregroundStyle(Theme.ink)
+                    .tint(Theme.inkMuted)
                 } else {
                     List {
                         section("Overdue", overduePeople)
                         section("Due Soon", dueSoonPeople)
                         section("On Track", onTrackPeople)
                     }
+                    .scrollContentBackground(.hidden)
                 }
             }
+            .background(Theme.background)
             .navigationTitle("Keep In Touch")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
@@ -72,6 +76,7 @@ struct PeopleListView: View {
                     } label: {
                         PersonRowView(person: person)
                     }
+                    .listRowBackground(Theme.surface)
                 }
                 .onDelete { offsets in
                     delete(list, at: offsets)

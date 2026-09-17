@@ -24,9 +24,12 @@ struct PostCallPromptView: View {
                             PersonRowView(person: person)
                         }
                         .buttonStyle(.plain)
+                        .listRowBackground(Theme.surface)
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(Theme.background)
             .navigationTitle("Just hung up — who was that?")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

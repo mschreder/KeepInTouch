@@ -28,12 +28,14 @@ struct AddPersonView: View {
                         Label("Choose from Contacts", systemImage: "person.crop.circle.badge.plus")
                     }
                 }
+                .listRowBackground(Theme.surface)
 
                 Section("Details") {
                     TextField("Name", text: $name)
                     TextField("Phone (optional)", text: $phoneNumber)
                         .keyboardType(.phonePad)
                 }
+                .listRowBackground(Theme.surface)
 
                 Section("Frequency") {
                     Picker("Remind me every", selection: $frequencyDays) {
@@ -45,6 +47,7 @@ struct AddPersonView: View {
                         Text("Every 6 months").tag(180)
                     }
                 }
+                .listRowBackground(Theme.surface)
 
                 Section("Birthday") {
                     Toggle("Remind me", isOn: $hasBirthday.animation())
@@ -52,10 +55,13 @@ struct AddPersonView: View {
                         DatePicker("Birthday", selection: $birthdayDate, displayedComponents: .date)
                         Text("Only the month and day are used — the year doesn't matter.")
                             .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Theme.inkMuted)
                     }
                 }
+                .listRowBackground(Theme.surface)
             }
+            .scrollContentBackground(.hidden)
+            .background(Theme.background)
             .navigationTitle("Add Person")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
