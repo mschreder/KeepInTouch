@@ -8,6 +8,8 @@ struct PersonDetailView: View {
     @Environment(NotificationService.self) private var notificationService
     @Environment(\.dismiss) private var dismiss
     @State private var showingDeleteConfirm = false
+    @State private var showingLogCallChoice = false
+    @State private var showingLogCallDatePicker = false
 
     var body: some View {
         Form {
@@ -59,7 +61,7 @@ struct PersonDetailView: View {
                     Text(lastContactedText)
                 }
                 Button("Log a call now") {
-                    logCall()
+                    showingLogCallChoice = true
                 }
             }
             .listRowBackground(Theme.surface)
@@ -97,6 +99,24 @@ struct PersonDetailView: View {
             }
             Button("Cancel", role: .cancel) {}
         }
+        .confirmationDialog(
+            "Log a call with \(person.name)",
+            isPresented: $showingLogCallChoice,
+            titleVisibility: .visible
+        ) {
+            Button("Today") {
+                logCall(date: Date())
+            }
+            Button("Choose a Date…") {
+                showingLogCallDatePicker = true
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+        .sheet(isPresented: $showingLogCallDatePicker) {
+            LogCallDatePickerSheet(initialDate: person.lastContactedAt ?? Date()) { date in
+                logCall(date: date)
+            }
+        }
     }
 
     private var avatar: some View {
@@ -120,8 +140,8 @@ struct PersonDetailView: View {
         return last.formatted(date: .abbreviated, time: .omitted)
     }
 
-    private func logCall() {
-        person.lastContactedAt = Date()
+    private func logCall(date: Date) {
+        person.lastContactedAt = date
         notificationService.reschedule(for: person)
     }
 

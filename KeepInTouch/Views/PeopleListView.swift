@@ -6,6 +6,7 @@ struct PeopleListView: View {
     @Environment(NotificationService.self) private var notificationService
     @Query(sort: \Person.createdAt) private var people: [Person]
     @State private var showingAddPerson = false
+    @State private var showingLogCall = false
 
     private var sortedPeople: [Person] {
         OverdueCalculator.sorted(people)
@@ -50,6 +51,9 @@ struct PeopleListView: View {
             .sheet(isPresented: $showingAddPerson) {
                 AddPersonView()
             }
+            .sheet(isPresented: $showingLogCall) {
+                LogCallPickerView()
+            }
             .task {
                 // Wait for the authorization prompt to resolve before scheduling,
                 // otherwise reminders can be added while still unauthorized.
@@ -65,15 +69,27 @@ struct PeopleListView: View {
                 .font(.organic(.largeTitle))
                 .foregroundStyle(Theme.ink)
             Spacer()
-            Button {
-                showingAddPerson = true
-            } label: {
-                Image(systemName: "plus")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
-                    .background(Color.accentColor)
-                    .clipShape(Circle())
+            HStack(spacing: 10) {
+                Button {
+                    showingLogCall = true
+                } label: {
+                    Image(systemName: "phone.arrow.up.right")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 36, height: 36)
+                        .background(Color.accentColor)
+                        .clipShape(Circle())
+                }
+                Button {
+                    showingAddPerson = true
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 36, height: 36)
+                        .background(Color.accentColor)
+                        .clipShape(Circle())
+                }
             }
         }
         .padding(.horizontal, 20)
