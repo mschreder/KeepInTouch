@@ -25,8 +25,7 @@ struct PeopleListView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                header
+            Group {
                 if people.isEmpty {
                     ContentUnavailableView {
                         Label("No one yet", systemImage: "leaf.fill")
@@ -46,9 +45,14 @@ struct PeopleListView: View {
                 }
             }
             .background(Theme.background)
-            .navigationTitle("Keep In Touch")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Text("Keep In Touch")
+                        .font(.organic(.largeTitle))
+                        .foregroundStyle(Theme.ink)
+                }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         showingAddPerson = true
@@ -67,17 +71,6 @@ struct PeopleListView: View {
                 notificationService.rescheduleAll(for: people)
             }
         }
-    }
-
-    private var header: some View {
-        Text("Keep In Touch")
-            .font(.organic(.largeTitle))
-            .foregroundStyle(Theme.ink)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 20)
-            .padding(.top, 12)
-            .padding(.bottom, 8)
-            .background(Theme.background)
     }
 
     @ViewBuilder
