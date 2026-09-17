@@ -14,14 +14,14 @@ struct AddPersonView: View {
     @State private var photoData: Data?
     @State private var contactIdentifier: String?
     @State private var frequencyDays = 30
-    @State private var showingPicker = false
+    @State private var pickerCoordinator = ContactPickerCoordinator()
 
     var body: some View {
         NavigationStack {
             Form {
                 Section {
                     Button {
-                        showingPicker = true
+                        presentContactPicker()
                     } label: {
                         Label("Choose from Contacts", systemImage: "person.crop.circle.badge.plus")
                     }
@@ -54,18 +54,31 @@ struct AddPersonView: View {
                         .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
-            .sheet(isPresented: $showingPicker) {
-                ContactPickerView(onPick: handlePicked, onCancel: { showingPicker = false })
-            }
         }
     }
 
-    private func handlePicked(_ contact: CNContact) {
-        showingPicker = false
-        contactIdentifier = contact.identifier
-        name = [contact.givenName, contact.familyName].filter { !$0.isEmpty }.joined(separator: " ")
-        phoneNumber = contact.phoneNumbers.first?.value.stringValue ?? ""
-        photoData = contact.thumbnailImageData
+    private func presentContactPicker() {
+        pickerCoordinator.onPick = { contact in
+            contactIdentifier = contact.identifier
+            name = [contact.givenName, contact.familyName].filter { !$0.isEmpty }.joined(separator: " ")
+            phoneNumber = contact.phoneNumbers.first?.value.stringValue ?? ""
+            photoData = contact.thumbnailImageData
+        }
+        let picker = CNContactPickerViewController()
+        picker.delegate = pickerCoordinator
+        topMostViewController()?.present(picker, animated: true)
+    }
+
+    private func topMostViewController() -> UIViewController? {
+        guard let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+              let root = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
+            return nil
+        }
+        var top = root
+        while let presented = top.presentedViewController {
+            top = presented
+        }
+        return top
     }
 
     private func save() {
@@ -82,37 +95,10 @@ struct AddPersonView: View {
     }
 }
 
-private struct ContactPickerView: UIViewControllerRepresentable {
-    var onPick: (CNContact) -> Void
-    var onCancel: () -> Void
+private final class ContactPickerCoordinator: NSObject, CNContactPickerDelegate {
+    var onPick: ((CNContact) -> Void)?
 
-    func makeUIViewController(context: Context) -> CNContactPickerViewController {
-        let picker = CNContactPickerViewController()
-        picker.delegate = context.coordinator
-        return picker
-    }
-
-    func updateUIViewController(_ uiViewController: CNContactPickerViewController, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(onPick: onPick, onCancel: onCancel)
-    }
-
-    final class Coordinator: NSObject, CNContactPickerDelegate {
-        let onPick: (CNContact) -> Void
-        let onCancel: () -> Void
-
-        init(onPick: @escaping (CNContact) -> Void, onCancel: @escaping () -> Void) {
-            self.onPick = onPick
-            self.onCancel = onCancel
-        }
-
-        func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
-            onPick(contact)
-        }
-
-        func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
-            onCancel()
-        }
+    func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
+        onPick?(contact)
     }
 }
